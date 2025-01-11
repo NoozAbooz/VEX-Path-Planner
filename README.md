@@ -1,2 +1,0 @@
-# VEX Path Planner
- 
