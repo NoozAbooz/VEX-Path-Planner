@@ -11,13 +11,13 @@ import os
 
 waypoints = []
 
-# defaults
+# Constant variables for testing
 robot_width = 13.5
 robot_length = 15
 robot_speed = 61.32 # in/s
 
 def handle_click(event):
-    if event.button == 1 and event.xdata and event.ydata:  # If left mouse button is clicked
+    if event.button == 1 and event.xdata and event.ydata:  # Check if left mouse button is clicked
         waypoints.append([event.xdata, event.ydata])  # save the click position
         draw_field()
     # if right mouse button then remove waypoint there
@@ -61,43 +61,6 @@ def draw_field():
 def start_simulation(event):
     print("test")
 
-def save_waypoints(event):
-    # tkinter dialog for file explorer wimdow
-    root = tk.Tk()
-    root.withdraw()
-    
-    file_path = filedialog.asksaveasfilename(
-        defaultextension=".json",
-        filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
-        title="Save waypoints as..."
-    )
-    
-    with open(file_path, 'w') as f:
-        json.dump(waypoints, f)
-    plt.title(f"Waypoints saved to {os.path.basename(file_path)}")
-    plt.draw()
-
-def load_waypoints(event):
-    global waypoints
-    # Create and hide the tkinter root window
-    root = tk.Tk()
-    root.withdraw()
-    
-    file_path = filedialog.askopenfilename(
-        filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
-        title="Load waypoints from..."
-    )
-    
-    if file_path:  # Only load if user didn't cancel
-        try:
-            with open(file_path, 'r') as f:
-                waypoints = json.load(f)
-            plt.title(f"Loaded waypoints from {os.path.basename(file_path)}")
-            draw_field()
-        except:
-            plt.title("Error loading file")
-            plt.draw()
-
 field_image = np.array(Image.open("HighStakes.png"))
 
 fig, ax = plt.subplots(figsize=(7, 7))  # window size
@@ -107,13 +70,10 @@ ax_load = plt.axes([0.7, 0.000001, 0.1, 0.075])
 ax_save = plt.axes([0.81, 0.000001, 0.1, 0.075])
 btn_load = Button(ax_load, 'Load')
 btn_save = Button(ax_save, 'Save')
-btn_save.on_clicked(save_waypoints)
-btn_load.on_clicked(load_waypoints)
 
 ax.set_xlim(0, 144)
 ax.set_ylim(0, 144)
 ax.set_aspect('equal')
-
 
 draw_field()  # Draw the initial empty field
 plt.show()  # Display the plot

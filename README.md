@@ -1,3 +1,5 @@
+`pip3 install -r requirements.txt`
+
 Left click on the field to place Waypoints
 Right click anywhere inside a waypoint to remove it
 

@@ -7,11 +7,11 @@ def save_path(window, filename=None):
         filename, _ = QFileDialog.getSaveFileName(
             window,
             "Save Path",
-            "savefile.json",
+            "savefile.json", # Default file name
             "JSON Files (*.json);;All Files (*)"
         )
     
-    if not filename: # many many error traps
+    if not filename: # Variety of error traps to detect if the user cancels the process at any point
         return False
         
     data = {
@@ -22,7 +22,7 @@ def save_path(window, filename=None):
             "heading": window.rotation_input.value()
         },
         "waypoints": []
-    }
+    } # Use dictionary to store write paramaters as per JSON standards
     
     # Convert waypoints to percentages (adapts to different screen/window sizes)
     # Reference https://github.com/NoozAbooz/210K-Website/blob/ce3e381cbd746c68d1a7d54ea709eeb4a8109d31/static/path/js/save.js#L30

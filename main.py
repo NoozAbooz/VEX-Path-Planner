@@ -2,6 +2,8 @@
 # Made by Michael Zheng for CS20 at Western Canada High School
 # January 10th, 2024
 
+# All functions have return type void and have no paramaters unless specified
+
 import sys
 import math
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QDockWidget, 
@@ -13,17 +15,17 @@ from PyQt6.QtCore import Qt, QRectF
 from file_streaming import save_path, load_path
 
 class fieldWidget(QWidget):
-    def __init__(self): # logic inherited from the tutorial
+    def __init__(self): # logic inherited from PyQt docs: https://www.pythonguis.com/tutorials/pyqt-basic-widgets/
         super().__init__()
         # Load field image
         self.field_image = QPixmap("HighStakes.png")
         self.setMinimumSize(600, 600)
         
-        # setup waypoint coords as a array ("list" in python)
+        # Setup waypoint coords as a array ("list" in python)
         self.waypoints = []
         
     def mousePressEvent(self, event):
-        # add mouse coords to waypoints list
+        # Add mouse coordinates to waypoints list
         if event.button() == Qt.MouseButton.LeftButton:
             self.waypoints.append(event.pos())
             self.update()
@@ -45,9 +47,9 @@ class fieldWidget(QWidget):
         if (nearestWaypointDistance < 10): # extra logic to make sure the click is on top of the waypoint itself
             self.waypoints.pop(nearestWaypointIndex)
 
-    def paintEvent(self, event): # think of this as the main "refresh" loop
+    def paintEvent(self, event): # Think of this as the main "refresh" loop
         painter = QPainter(self)
-        # resize field diagram to fit inside the window
+        # Resize the field diagram to fit inside the window
         scaled_image = self.field_image.scaled(
             self.size(),
             Qt.AspectRatioMode.KeepAspectRatio,
@@ -58,13 +60,13 @@ class fieldWidget(QWidget):
         y = (self.height() - scaled_image.height()) // 2
         painter.drawPixmap(x, y, scaled_image)
 
-        if self.waypoints: # make sure there are waypoints to render
+        if self.waypoints: # Make sure there are waypoints to render to prevent errors & crashes
             # Draw lines between points first so it goes on the bottom layer
             painter.setPen(QPen(QColor(205, 205, 255), 3))  # white lines
             for i in range(len(self.waypoints) - 1):
                 painter.drawLine(self.waypoints[i], self.waypoints[i+1])
 
-            painter.setPen(QPen(QColor(205, 105, 255, 128), 2))  # translucent white points
+            painter.setPen(QPen(QColor(205, 105, 255, 128), 2))  # Set brush to make a ranslucent white points
             for i, waypoint in enumerate(self.waypoints):
                 # Different colors for start/end points
                 if i == 0:  # Start point (green)
@@ -75,14 +77,14 @@ class fieldWidget(QWidget):
                     painter.setBrush(QColor(205, 105, 255, 128))
                 painter.drawEllipse(waypoint, 10, 10)
             
-                # number the points
+                # Number the points
                 painter.setPen(Qt.GlobalColor.white)
                 painter.setFont(QFont('Arial', 10))
                 text_rect = QRectF(waypoint.x() + 15, waypoint.y() - 10, 20, 20)
                 painter.fillRect(text_rect, QColor(0, 0, 0, 160))  # semi-transparent black background
                 painter.drawText(text_rect, Qt.AlignmentFlag.AlignCenter, str(i + 1))
 
-            # heading indicator for the starting waypoint
+            # QOL Heading indicator for the starting waypoint
             starting_waypoint = self.waypoints[0]
             heading_rad = math.radians(self.parent().rotation_input.value()) - math.pi / 2
             arrow_length = 10
@@ -92,14 +94,14 @@ class fieldWidget(QWidget):
             painter.setPen(QPen(QColor(255, 255, 255), 2))
             painter.drawLine(int(starting_waypoint.x()), int(starting_waypoint.y()), end_x, end_y)
 
-        # write to code preview box when the field is updated
+        # Write to code preview box when the field is updated to optimize the program instead of making another update loop
         self.parent().code_preview.setText(self.parent().copy_code())
 
     def mirror_path(self):
         if self.waypoints:
             field_width = self.width()
             for point in self.waypoints:
-                # this logic relies on the field image being horizontally centered in the widget
+                # This logic relies on the field image being horizontally centered in the widget
                 point.setX(field_width - point.x())
             self.update()
 
@@ -157,7 +159,7 @@ class MainWindow(QMainWindow):
         paths_btn = QPushButton("Save/Load Path")
         paths_btn.setToolTip("Left click to save, right click to load")
         paths_btn.clicked.connect(lambda: save_path(self))
-        # the right click functionality is added to save vertical space since the code preview box is already very small ;-;
+        # The right click functionality is added to save vertical space since the code preview box is already very small ;-;
         paths_btn.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         paths_btn.customContextMenuRequested.connect(lambda: load_path(self)) # https://stackoverflow.com/questions/71012127/making-a-custom-right-click-context-menu-in-pyqt5
         layout.addRow(paths_btn)
@@ -199,18 +201,18 @@ class MainWindow(QMainWindow):
             rot_x, rot_y = self.localize_waypoint(waypoint, start, self.rotation_input.value())
             code += f"chassis.moveToPoint({rot_x}, {rot_y}, 2000);\n"
         
-        QApplication.clipboard().setText(code) # copy to clipboard
+        QApplication.clipboard().setText(code) # Overwrite clipboard
         return code
 
 def main():
-    # initialization boilerplate
+    # Initialization boilerplate
     app = QApplication(sys.argv)	
     # Create the main window
     window = MainWindow()
     window.show()
     #window.setWindowTitle("Hello, PyQt!")
     
-    # execution boilerplate
+    # Execution boilerplate
     sys.exit(app.exec())
 
 if __name__ == "__main__":
